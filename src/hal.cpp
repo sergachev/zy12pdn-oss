@@ -20,8 +20,8 @@
 namespace usb_pd {
 
 constexpr auto fusb302_int_n_port = GPIOA;
-constexpr uint16_t fusb302_int_n_pin = GPIO13;
-constexpr uint8_t fusb302_i2c_addr = 0x22;
+constexpr uint16_t fusb302_int_n_pin = GPIO0;
+constexpr uint8_t fusb302_i2c_addr = 0b0100100;
 
 constexpr auto led_red_port = GPIOA;
 constexpr uint16_t led_red_pin = GPIO5;
@@ -30,8 +30,8 @@ constexpr uint16_t led_green_pin = GPIO6;
 constexpr auto led_blue_port = GPIOA;
 constexpr uint16_t led_blue_pin = GPIO7;
 
-constexpr auto button_port = GPIOF;
-constexpr uint16_t button_pin = GPIO1;
+constexpr auto button_port = GPIOA;
+constexpr uint16_t button_pin = GPIO9;
 
 static i2c_bit_bang i2c;
 
@@ -44,7 +44,7 @@ void mcu_hal::init()
     rcc_periph_clock_enable(RCC_GPIOA);
     rcc_periph_clock_enable(RCC_GPIOF);
 
-    // Initialize systick (nterrupt every 1ms)
+    // Initialize systick (interrupt every 1ms)
     systick_set_clocksource(STK_CSR_CLKSOURCE_AHB);
     systick_set_reload(rcc_ahb_frequency / 1000 - 1);
     systick_interrupt_enable();

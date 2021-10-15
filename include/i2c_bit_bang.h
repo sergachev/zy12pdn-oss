@@ -15,9 +15,9 @@
 namespace usb_pd {
 
 constexpr auto scl_port = GPIOA;
-constexpr uint16_t scl_pin = GPIO10;
+constexpr uint16_t scl_pin = GPIO4;
 constexpr auto sda_port = GPIOA;
-constexpr uint16_t sda_pin = GPIO9;
+constexpr uint16_t sda_pin = GPIO10;
 
 struct i2c_bit_bang {
     void init();

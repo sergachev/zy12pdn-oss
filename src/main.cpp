@@ -27,12 +27,6 @@ static eeprom nvs;
 
 static uint8_t selected_capability = 0;
 
-// Modes:
-// 0: voltage selectable by button
-// 100: maximum voltage
-// others: voltage in V
-static uint16_t desired_mode = 0;
-
 static void sink_callback(callback_event event);
 static void update_led();
 static void switch_voltage();
@@ -53,12 +47,6 @@ int main()
     if (hal.has_button_been_pressed())
         run_config_mode();
 
-    // Read the configured mode
-    if (!nvs.read(nvs_voltage_key, &desired_mode))
-        desired_mode = 0;
-
-    DEBUG_LOG("Saved mode: %d\r\n", desired_mode);
-
     power_sink.set_event_callback(sink_callback);
     power_sink.init();
 
@@ -72,10 +60,6 @@ void loop()
 {
     hal.poll();
     power_sink.poll();
-
-    // In mode 0, the button switches the voltage
-    if (desired_mode == 0 && hal.has_button_been_pressed())
-        switch_voltage();
 }
 
 // Change the voltage to the next source capability
@@ -136,27 +120,19 @@ void sink_callback(callback_event event)
 }
 
 // Called when the source advertises new capabilities
-// Be careful with debug output. If one of the capbilities is not
-// requested in time, the power suplly will reset.
+// Be careful with debug output. If one of the capabilities is not
+// requested in time, the power supply will reset.
 void on_source_caps_changed()
 {
     int voltage = 5000;
 
-    if (desired_mode == 0) {
-        // Use first advertised voltage
-        selected_capability = 0;
-        voltage = power_sink.source_caps[0].voltage;
-
-    } else if (desired_mode == 100) {
-        // Take maximum voltage
-        for (int i = 0; i < power_sink.num_source_caps; i++)
-            voltage = std::max(voltage, static_cast<int>(power_sink.source_caps[i].voltage));
-
-    } else {
-        // Search for desried voltage (if not found -> 5V)
-        for (int i = 0; i < power_sink.num_source_caps; i++) {
-            if (power_sink.source_caps[i].voltage == desired_mode * 1000)
-                voltage = power_sink.source_caps[i].voltage;
+    // Search for desired voltage (if not found -> 5V)
+    for (int i = 0; i < power_sink.num_source_caps; i++) {
+        if (power_sink.source_caps[i].voltage == 9000)
+            voltage = 9000;
+        else if (power_sink.source_caps[i].voltage == 12000) {
+            voltage = 12000;
+            break;
         }
     }
 
@@ -191,8 +167,6 @@ void update_led()
     // In USB 2.0 mode or if the voltage is different from the desired one, flash the LED
     if (power_sink.protocol() == pd_protocol::usb_20) {
         flash_duration = 600;
-    } else if (desired_mode != 0 && desired_mode != 100 && power_sink.active_voltage != 1000 * desired_mode) {
-        flash_duration = 1000;
     }
 
     hal.set_led(c, flash_duration, flash_duration);
