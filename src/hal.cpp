@@ -21,7 +21,7 @@ namespace usb_pd {
 
 constexpr auto fusb302_int_n_port = GPIOA;
 constexpr uint16_t fusb302_int_n_pin = GPIO0;
-constexpr uint8_t fusb302_i2c_addr = 0b0100100;
+constexpr uint8_t fusb302_i2c_addr = 0b0100010;
 
 constexpr auto led_red_port = GPIOA;
 constexpr uint16_t led_red_pin = GPIO5;
